@@ -1,0 +1,165 @@
+ .Header {
+    width: 100%;
+    height: 50px;
+    opacity: 0.7; 
+    position: fixed;
+    transition: all .2s linear;
+    z-index: 150;
+}
+
+.u-portal {
+    font-family: latin-100,arabic-100,sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+    background: url(https://starzplay-img-prod-ssl.akamaized.net/prd-peg-data/default/images/starzplay-bg.jpg) no-repeat 100% 0 #070707;
+    background-size: 100% auto;
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* html {
+    font-size: 62.5%;
+    -webkit-tap-highlight-color: transparent;
+} */
+
+
+#logos {
+    color: #fff;
+    font-size: 39px;
+    padding-left: 60px;
+    text-transform: uppercase; 
+    padding-right: 70px;
+}
+
+#first {
+    font-family: latin-100,arabic-100,sans-serif;
+    font-size: 39px;
+    font-weight: 900;
+    text-decoration: underline;
+}
+
+#next {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 100;
+    text-decoration: none;
+    
+}  
+
+/* .Header-logo {
+    width: 150px;
+    height: 150px;
+} */
+
+
+ .u-portal .Header #headerLogo {
+    line-height: 1;
+}
+
+.Navbar-item-link {
+    text-decoration: none;
+    color: #666;
+    font-family: latin-100,arabic-100,sans-serif;
+    font-size: 24px;
+    line-height: 1.5;
+    letter-spacing: 0.1em;
+}
+
+.Navbar-item-link:hover{
+    color: white;
+    font-weight: bolder;
+    content: " ";
+    width: 40%;
+    bottom: -5px;
+    left: 30%;
+    height: 2px;
+}
+
+ .main-menu {
+    list-style: none;
+}
+
+nav {
+  width: 100%;
+  height: 120px;
+  background-color: black;
+  position: fixed;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  padding-right: 0;
+  position: absolute;
+}
+
+.Navbar-item {
+  display: inline;
+  padding-right: 90px; 
+}
+
+
+.jumbotron {
+   
+    color: #fff;
+    margin-top: 200px;
+
+} 
+
+  #login-button, #signup-button {
+    font-size: 16px;
+    color: #fff;
+}
+
+#login-button:hover, #signup-button:hover {
+    color: #666;
+    content: " ";
+    width: 40%;
+    bottom: -5px;
+    left: 30%;
+    height: 2px;
+} 
+
+#movies img, #movie img{
+    width:100%;
+  }
+  
+  @media(min-width:960px){
+    #movies .col-md-3 .well{
+      height: 390px;
+    }
+  
+    #movies .col-md-3 img{
+      height:240px;
+    }
+  }
+
+
+  .footer {
+    border-top: 1px solid rgb(146, 135, 135);
+    padding: 20px 0;
+    position: relative;
+    z-index: 10;
+}
+
+.menu-company {
+    list-style: none;
+    display: inline;
+    
+}
+
+.copyright{
+    color: #666;
+    font-size: 1.2rem;
+    -ms-flex-order: 4;
+    order: 4;
+    margin: 55px 0;
+
+}
+
+small {
+    font-size: 80%;
+    font-size: smaller;
+}
+
+
+    .thumbnail {
+        
+    }
