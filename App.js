@@ -5,28 +5,43 @@ const IMAGE_HOST = 'https://image.tmdb.org/t/p/w500/';
 
 $(document).ready(() => {
     renderPopular();
+    getFavoriteMovies();
+    renderFavorites();
 
   $('#searchForm').on('submit', (e) => {
     let searchText = $('#searchText').val();
-    getMovies(searchText);
     renderUserSearch(searchText);
     e.preventDefault();
   });
 });
 
+function getFavoriteMovies () {
+    return JSON.parse(window.localStorage.getItem('favMov') || '[]');
+}
+
 function renderPopular() {
     fetchPopular().then((data) => {
-        getTmbdMovies(data.data.results.splice(0, 4));
+        getTmbdMovies(data.data.results.splice(0, 4), '#movies');
+        setListeners();
     });
+}
+
+function renderFavorites() {
+    let favMov = getFavoriteMovies();
+    if (favMov) {
+        getTmbdMovies(favMov, '#favorites-movies');
+        setListeners();
+    }
 }
 
 function renderUserSearch (searchText) {
     search(searchText).then((data) => {
-        getTmbdMovies(data.data.results);
+        getTmbdMovies(data.data.results, '#movies');
+        setListeners();
     });
 }
 
-function getTmbdMovies (data) {
+function getTmbdMovies (data, stringToReplase) {
     let resultsMovies = data;
     let output = '';
 
@@ -34,13 +49,32 @@ function getTmbdMovies (data) {
         output += getMovieItemHtml(movieObject);
     });
 
-    $('#movies').html(output);
+    $(stringToReplase).html(output);
+}
 
+function setListeners () {
     document.querySelectorAll('.open-movie').forEach((nodeItem) => {
-        nodeItem.addEventListener('click', (event) => {
-            let movieID = event.target.dataset.id;
-            movieSelectedNew(movieID);
-        })
+        handleIMDBlink(nodeItem);
+    });
+
+    document.querySelectorAll('.like-movie').forEach((nodeItem) => {
+        handleMovieSafe(nodeItem);
+    })
+}
+
+function handleIMDBlink (nodeItem) {
+    nodeItem.addEventListener('click', (event) => {
+        let movieID = event.target.dataset.id;
+        movieSelectedNew(movieID);
+    })
+}
+
+function handleMovieSafe (nodeItem) {
+    nodeItem.addEventListener('click', (event) => {
+        let movieData = event.target.dataset;
+        let favMov = getFavoriteMovies();
+        favMov.push(movieData);
+        window.localStorage.setItem('favMov', JSON.stringify(favMov));
     })
 }
 
@@ -49,10 +83,9 @@ function movieSelectedNew (movieId) {
         fetchMovieCredits(movieId).then((responseData) => {
             let movie = response.data;
             let credits = responseData.data;
-            console.log(movie)
-            console.log(credits)
             let mainChars = credits.cast.slice(0, 3);
             let crew = credits.crew;
+
             let mainCharsNames = mainChars.reduce((reducer, item) => {
                 return reducer + `${item.name} (as ${item.character}), `
             }, '')
@@ -69,8 +102,6 @@ function movieSelectedNew (movieId) {
                 return reducer + `${item.name}, `;
             }, '')
 
-
-
             let genres = movie.genres.reduce((reduser, item, index ) => {
                 return (index === movie.genres.length - 1) ? reduser + item.name.toLowerCase() : reduser + item.name.toLowerCase() + ', ';
             }, '');
@@ -78,7 +109,7 @@ function movieSelectedNew (movieId) {
             let output =`
             <div class="row">
                 <div class="col-md-4">
-                <img src="${IMAGE_HOST}${movie.backdrop_path}" width="250px" class="thumbnail">
+                    <img src="${IMAGE_HOST}${movie.backdrop_path}" width="250px" class="thumbnail">
                 </div>
                 <div class="col-md-8">
                 <h2>${movie.original_title}</h2>
@@ -98,9 +129,9 @@ function movieSelectedNew (movieId) {
             <div class="row">
                 <div class="well">
                 <h3>Plot</h3>
-                ${movie.overview}
-                <hr>
-                <a href="https://www.imdb.com/title/${movie.imdb_id}" target="_blank" class="btn btn-primary">View IMDB page</a>
+                    ${movie.overview}
+                    <hr>
+                    <a href="https://www.imdb.com/title/${movie.imdb_id}" target="_blank" class="btn btn-primary">View IMDB page</a>
                 </div>
             </div>
             `;
@@ -116,86 +147,12 @@ function getMovieItemHtml (movieData) {
     return `
         <div class="col-md-3">
         <div class="well text-center">
-            <img src=${IMAGE_HOST}${movieData.poster_path}>
+            <img src=${IMAGE_HOST}${movieData.poster_path} width="250px" >
             <h5>${movieData.title}</h5>
-            <a class="open-movie" data-id="${movieData.id}" class="btn btn-primary" href="#">Movie Details</a>
+            <a class="like-movie" data-id="${movieData.id}" data-poster_path="${movieData.poster_path}" data-title="${movieData.title}" class="btn btn-primary" href="#">Like</a>
+            <a class="open-movie" data-id="${movieData.id} class="btn btn-primary" href="#">Movie Details</a>
         </div>
         </div>
     `;
-}
-
-function getMovies(searchText){
-  axios.get('http://www.omdbapi.com?apikey=56a567e7'+ '&s='+searchText)
-    .then((response) => {
-      let movies = response.data.Search;
-      let output = '';
-
-      $.each(movies, (index, movie) => {
-        output += `
-          <div class="col-md-3">
-            <div class="well text-center">
-              <img src="${movie.Poster}">
-              <h5>${movie.Title}</h5>
-              <a onclick="movieSelected('${movie.imdbID}')" class="btn btn-primary" href="#">Movie Details</a>
-            </div>
-          </div>
-        `;
-      });
-
-      $('#movies').html(output);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-
-function movieSelected(id){
-  sessionStorage.setItem('movieId', id);
-  window.location = 'movie.html';
-  return false;
-}
-
-function getMovie(){
-  let movieId = sessionStorage.getItem('movieId');
-
-  axios.get('http://www.omdbapi.com?apikey=56a567e7'+'&i='+movieId)
-    .then((movie) => {
-
-      console.log(movie);
-
-      let output =`
-        <div class="row">
-          <div class="col-md-4">
-            <img src="${movie.Poster}" class="thumbnail">
-          </div>
-          <div class="col-md-8">
-            <h2>${movie.Title}</h2>
-            <ul class="list-group">
-              <li class="list-group-item"><strong>Genre:</strong> ${movie.Genre}</li>
-              <li class="list-group-item"><strong>Released:</strong> ${movie.Released}</li>
-              <li class="list-group-item"><strong>Rated:</strong> ${movie.Rated}</li>
-              <li class="list-group-item"><strong>IMDB Rating:</strong> ${movie.imdbRating}</li>
-              <li class="list-group-item"><strong>Director:</strong> ${movie.Director}</li>
-              <li class="list-group-item"><strong>Writer:</strong> ${movie.Writer}</li>
-              <li class="list-group-item"><strong>Actors:</strong> ${movie.Actors}</li>
-            </ul>
-          </div>
-        </div>
-        <div class="row">
-          <div class="well">
-            <h3>Plot</h3>
-            ${movie.Plot}
-            <hr>
-            <a href="https://www.imdb.com/title/${movie.imdbID}" target="_blank" class="btn btn-primary">View IMDB page</a>
-            <a href="index.html" class="btn btn-default">Go Back To Search</a>
-          </div>
-        </div>
-      `;
-
-      $('#movie').html(output);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
 }
 
